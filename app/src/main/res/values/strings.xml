@@ -1,0 +1,124 @@
+<resources>
+    <string name="app_name">Test Omron</string>
+    <string name="api_key">A92E2B6C-91A7-4CE0-872A-E8C64037A438</string>
+
+    <string name="user">User 1</string>
+    <string name="user_1">User 2</string>
+    <string name="user_3">User 3</string>
+    <string name="user_4">User 4</string>
+    <string name="user_height">Height</string>
+    <string name="user_weight">Weight</string>
+    <string name="user_stride">Stride</string>
+    <string name="btnstart">Start</string>
+    <string name="select_user">Select User</string>
+    <string name="saved_devices">Saved Devices</string>
+    <string name="device_list">Paired Devices</string>
+    <string name="enter_user_details">Personal Settings</string>
+    <string name="device_reg_sucess">Device Registration Successful</string>
+    <string name="pair_amp_transfer"><![CDATA[Pair & Transfer]]></string>
+    <string name="scan">Scan</string>
+    <string name="transfer">Transfer</string>
+    <string name="update">Update</string>
+    <string name="time_format">Time format : %s HR</string>
+    <string name="time_format_12">24 H</string>
+    <string name="time_format_24">12 H</string>
+    <string name="omron_connected_devices">OMRON Connected Devices</string>
+
+    <string name="time_stamp">Timestamp</string>
+    <string name="systolic">Systolic</string>
+    <string name="diastolic">Diastolic</string>
+    <string name="pulse_rate">Pulse Rate</string>
+    <string name="user_selected">User Selected</string>
+    <string name="hypen">-</string>
+    <string name="status">Status</string>
+    <string name="Error">Error</string>
+    <string name="blood_pressure">Blood Pressure</string>
+    <string name="device_information">Device Information</string>
+    <string name="device_disconnected">Device Disconected</string>
+    <string name="retry_to_connect">"Press Retry to connect again "</string>
+    <string name="retry">Retry</string>
+    <string name="cancel">Cancel</string>
+
+    <string-array name="height_greater">
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+
+    <string-array name="height_lower">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+    </string-array>
+
+    <string-array name="stride_greater">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="stride_lower">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+    </string-array>
+    <string name="title_activity_data_listing">Data ListingActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="device_connected">Device Connected</string>
+    <string name="device_paired">Omron Device Paired Successfully!</string>
+    <string name="title_activity_reminder">Reminder</string>
+    <string name="update_reminder">Updating Reminder...</string>
+    <string name="update_success">Updation Success</string>
+    <string name="update_failed">Updation Failed</string>
+    <string name="update_settings_sucess">Successfully updated the settings!</string>
+    <string name="device_time_format">DeviceTime Format : </string>
+
+    <string-array name="days">
+        <item>Sun</item>
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+    </string-array>
+    <string name="title_activity_listing">ActivityListingActivity</string>
+    <string name="bmi">BMI</string>
+    <string name="body_age">Body Age</string>
+    <string name="title_activity_user_personal_settings">UserPersonalSettingsActivity</string>
+    <string name="date_of_birth">Date Of Birth</string>
+    <string name="weight_unit">Weight Unit</string>
+    <string name="weight_settings">Weight Settings</string>
+    <string name="set">Set</string>
+    <string name="user_gender">Gender</string>
+    <string name="resting_metabolism">Resting Metabolism</string>
+    <string name="dci_value">DCI Value</string>
+    <string name="skeletal_muscle">Skeletal Muscle</string>
+
+    <string name="audio_title_permission_required">Permission is required.</string>
+    <string name="audio_message_permission">Please tap "Allow" when the audio recording permission dialog appears.</string>
+    <string name="audio_message_go_to_settings">Please give permissions on the setting screen.</string>
+
+    <string name="oxygen_saturation">Oxygen Saturation</string>
+    <string name="spo2">SpO2</string>
+</resources>
