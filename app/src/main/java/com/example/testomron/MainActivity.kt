@@ -27,20 +27,19 @@ import com.omronhealthcare.OmronConnectivityLibrary.OmronLibrary.Model.OmronErro
 import com.omronhealthcare.OmronConnectivityLibrary.OmronLibrary.Model.OmronPeripheral
 import com.omronhealthcare.OmronConnectivityLibrary.OmronLibrary.OmronUtility.OmronConstants
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+
     private var mContext: Context? = null
     private val TAG = "OmronSampleApp"
 
     private var mLvScannedList: ListView? = null
-    private var mPeripheralList: ArrayList<OmronPeripheral>? = null
+    private var mPeripheralList: java.util.ArrayList<OmronPeripheral>? = null
     private var mScannedDevicesAdapter: ScannedDevicesAdapter? = null
     private var mSelectedPeripheral: OmronPeripheral? = null
 
-    private var selectedUsers = ArrayList<Int?>()
+    private var selectedUsers = java.util.ArrayList<Int>()
 
     private var mRlDeviceListView: RelativeLayout? = null
     private  var mRlTransferView:RelativeLayout? = null
@@ -56,14 +55,14 @@ class MainActivity : AppCompatActivity() {
     private  var mTvErrorCode:TextView? = null
     private  var mTvErrorDesc:TextView? = null
     private var mProgressBar: ProgressBar? = null
-    
-    private val preferencesManager: PreferencesManager? = null
 
     private var scanBtn: Button? = null
     private var transferBtn: Button? = null
 
-    var device: HashMap<String?, String?>? = null
-    var personalSettings: HashMap<String?, String?>? = null
+    private var preferencesManager: PreferencesManager? = null
+
+    var device: java.util.HashMap<String, String>? = null
+    var personalSettings: java.util.HashMap<String, String>? = null
 
     private var isScan: Boolean? = null
 
@@ -80,21 +79,28 @@ class MainActivity : AppCompatActivity() {
 
         isScan = false
 
-        /*// Selected users
-        selectedUsers =
-            (intent.getSerializableExtra(Constants.extraKeys.KEY_SELECTED_USER) as ArrayList<Int?>?)!!
+        if (preferencesManager == null) preferencesManager = PreferencesManager(this@MainActivity)
+
+        // Selected users
+        /*selectedUsers =
+            intent.getSerializableExtra(Constants.extraKeys.KEY_SELECTED_USER) as ArrayList<Int>
         if (selectedUsers == null) {
             selectedUsers = ArrayList()
             selectedUsers.add(1)
         }*/
 
+        selectedUsers = ArrayList()
+        selectedUsers.add(1)
+
         // Selected device
         device =
-            intent.getSerializableExtra(Constants.extraKeys.KEY_SELECTED_DEVICE) as HashMap<String?, String?>?
+            intent.getSerializableExtra(Constants.extraKeys.KEY_SELECTED_DEVICE) as HashMap<String, String>?
+
+        //Personal settings like height, weight etc for activity devices.
 
         //Personal settings like height, weight etc for activity devices.
         personalSettings =
-            intent.getSerializableExtra(Constants.extraKeys.KEY_PERSONAL_SETTINGS) as HashMap<String?, String?>?
+            intent.getSerializableExtra(Constants.extraKeys.KEY_PERSONAL_SETTINGS) as HashMap<String, String>?
 
         initViews()
         showDeviceListView()
@@ -102,7 +108,11 @@ class MainActivity : AppCompatActivity() {
         initLists()
 
         // Permissions for HeartGuide devices
+
+        // Permissions for HeartGuide devices
         requestPermissions()
+
+        // Start OmronPeripheralManager
 
         // Start OmronPeripheralManager
         startOmronPeripheralManager(false, true)
@@ -111,13 +121,22 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-
         // Activity Tracker - Testing of notification
         if (device!![OmronConstants.OMRONBLEConfigDevice.Category]!!.toInt() == OmronConstants.OMRONBLEDeviceCategory.ACTIVITY) {
             Utilities.scheduleNotification(Utilities.getNotification("Test Notification"), 5000)
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        enableDisableButton(true)
+
+    }
+
+
+    /**
+     * Permissions for activity device
+     */
     private fun requestPermissions() {
 
         // Activity Tracker
@@ -130,6 +149,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -169,6 +189,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Configure library functionalities
+     */
     private fun startOmronPeripheralManager(isHistoricDataRead: Boolean, isPairing: Boolean) {
         val peripheralConfig =
             OmronPeripheralManager.sharedManager(App.getInstance().applicationContext).configuration
@@ -178,16 +201,20 @@ class MainActivity : AppCompatActivity() {
         if (device != null && device!![OmronConstants.OMRONBLEConfigDevice.GroupID] != null && device!![OmronConstants.OMRONBLEConfigDevice.GroupIncludedGroupID] != null) {
 
             // Add item
-            val filterDevices: MutableList<HashMap<String?, String?>?> =
-                ArrayList()
-            filterDevices.add(device)
+            val filterDevices: MutableList<HashMap<String, String>> = ArrayList()
+            filterDevices.add(device!!)
             OmronPeripheralManagerConfig.deviceFilters = filterDevices
         }
-        var deviceSettings: ArrayList<HashMap<*, *>?>? = ArrayList()
+        var deviceSettings = ArrayList<HashMap<*, *>?>()
 
         // Blood pressure settings (optional)
         deviceSettings = getBloodPressureSettings(deviceSettings, isPairing)
 
+        // Activity device settings (optional)
+        deviceSettings = getActivitySettings(deviceSettings)
+
+        // BCM device settings (optional)
+        deviceSettings = getBCMSettings(deviceSettings)
         OmronPeripheralManagerConfig.deviceSettings = deviceSettings
 
         // Set Scan timeout interval (optional)
@@ -267,8 +294,8 @@ class MainActivity : AppCompatActivity() {
                         if (resultInfo.resultCode == 0) {
                             mPeripheralList = peripheralList
                             if (mScannedDevicesAdapter != null) {
-                                mScannedDevicesAdapter?.setPeripheralList(mPeripheralList)
-                                mScannedDevicesAdapter?.notifyDataSetChanged()
+                                mScannedDevicesAdapter!!.setPeripheralList(mPeripheralList)
+                                mScannedDevicesAdapter!!.notifyDataSetChanged()
                             }
                         } else {
                             isScan = !isScan!!
@@ -449,7 +476,7 @@ class MainActivity : AppCompatActivity() {
                     mTvDeviceUuid!!.text = peripheral.uuid
                     val deviceInformation = peripheral.deviceInformation
                     Log.d(TAG, "Device Information : $deviceInformation")
-                    val deviceSettings = mSelectedPeripheral!!.getDeviceSettings()
+                    val deviceSettings = mSelectedPeripheral!!.deviceSettings
                     if (deviceSettings != null) {
                         Log.d(TAG, "Device Settings:$deviceSettings")
                     }
@@ -592,21 +619,18 @@ class MainActivity : AppCompatActivity() {
         OmronPeripheralManager.sharedManager(App.getInstance().applicationContext)
             .startDataTransferFromPeripheral(
                 peripheral,
-                selectedUsers[0]!!,
-                true,
-                OmronConstants.OMRONVitalDataTransferCategory.BloodPressure
+                selectedUsers[0], true, OmronConstants.OMRONVitalDataTransferCategory.BloodPressure
             ) { peripheral, resultInfo ->
                 if (resultInfo.resultCode == 0 && peripheral != null) {
                     val deviceInformation = peripheral.deviceInformation
                     Log.d(TAG, "Device Information : $deviceInformation")
-                    val allSettings =
-                        peripheral.deviceSettings as ArrayList<HashMap<*, *>>
+                    val allSettings = peripheral.deviceSettings as ArrayList<HashMap<*, *>>
                     Log.i(TAG, "Device settings : $allSettings")
                     mSelectedPeripheral = peripheral // Saving for Transfer Function
 
                     // Save Device to List
                     // To change based on data available
-                    preferencesManager?.addDataStoredDeviceList(
+                    preferencesManager!!.addDataStoredDeviceList(
                         peripheral.localName,
                         device!![OmronConstants.OMRONBLEConfigDevice.Category]!!
                             .toInt(),
@@ -660,7 +684,7 @@ class MainActivity : AppCompatActivity() {
 
                     // Save Device to List
                     // To change based on data available
-                    preferencesManager?.addDataStoredDeviceList(
+                    preferencesManager!!.addDataStoredDeviceList(
                         peripheral.localName,
                         device!![OmronConstants.OMRONBLEConfigDevice.Category]!!
                             .toInt(),
@@ -792,7 +816,7 @@ class MainActivity : AppCompatActivity() {
         if (isWait) {
             mHandler = Handler()
             mRunnable = Runnable { continueDataTransfer() }
-            mHandler!!.postDelayed(mRunnable!!, TIME_INTERVAL.toLong())
+            mHandler?.postDelayed(mRunnable!!, TIME_INTERVAL.toLong())
         } else {
             if (mHandler != null) mHandler!!.removeCallbacks(mRunnable!!)
             continueDataTransfer()
@@ -1127,6 +1151,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Settings update for Connectivity library
+
+    // Settings update for Connectivity library
     private fun updateSettings() {
         if (mSelectedPeripheral == null) {
             mTvErrorDesc!!.text = "Device Not Paired"
@@ -1143,8 +1169,8 @@ class MainActivity : AppCompatActivity() {
         if (device != null && device!![OmronConstants.OMRONBLEConfigDevice.GroupID] != null && device!![OmronConstants.OMRONBLEConfigDevice.GroupIncludedGroupID] != null) {
 
             // Add item
-            val filterDevices: MutableList<HashMap<String?, String?>?>? = ArrayList()
-            filterDevices?.add(device)
+            val filterDevices: MutableList<HashMap<String, String>> = ArrayList()
+            filterDevices.add(device!!)
             OmronPeripheralManagerConfig.deviceFilters = filterDevices
         }
         val settingsModel = HashMap<String, String>()
@@ -1282,7 +1308,7 @@ class MainActivity : AppCompatActivity() {
 
         //Create peripheral object with localname and UUID
         val peripheral =
-            OmronPeripheral(mSelectedPeripheral!!.getLocalName(), mSelectedPeripheral!!.getUuid())
+            OmronPeripheral(mSelectedPeripheral!!.localName, mSelectedPeripheral!!.uuid)
 
         //Call to update the settings
         OmronPeripheralManager.sharedManager(App.getInstance().applicationContext).updatePeripheral(
@@ -1322,9 +1348,9 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun getBloodPressureSettings(
-        deviceSettings: ArrayList<HashMap<*, *>?>?,
+        deviceSettings: ArrayList<HashMap<*, *>?>,
         isPairing: Boolean
-    ): ArrayList<HashMap<*, *>?>? {
+    ): ArrayList<HashMap<*, *>?> {
 
         // Blood Pressure
         if (device!![OmronConstants.OMRONBLEConfigDevice.Category]!!.toInt() == OmronConstants.OMRONBLEDeviceCategory.BLOODPRESSURE) {
@@ -1350,13 +1376,13 @@ class MainActivity : AppCompatActivity() {
             transferSettings[OmronConstants.OMRONDeviceScanSettingsKey] = transferModeSettings
 
             // Personal settings for device
-            deviceSettings?.add(personalSettings)
-            deviceSettings?.add(transferSettings)
+            deviceSettings.add(personalSettings)
+            deviceSettings.add(transferSettings)
         }
         return deviceSettings
     }
 
-    private fun getActivitySettings(deviceSettings: ArrayList<HashMap<*, *>>): ArrayList<HashMap<*, *>>? {
+    private fun getActivitySettings(deviceSettings: ArrayList<HashMap<*, *>?>): ArrayList<HashMap<*, *>?> {
 
         // Activity Tracker
         if (device!![OmronConstants.OMRONBLEConfigDevice.Category]!!.toInt() == OmronConstants.OMRONBLEDeviceCategory.ACTIVITY) {
@@ -1469,8 +1495,7 @@ class MainActivity : AppCompatActivity() {
                 val notificationEnableSettings = HashMap<String, Any>()
                 notificationEnableSettings[OmronConstants.OMRONDeviceNotificationStatusKey] =
                     OmronConstants.OMRONDeviceNotificationStatus.On
-                val notificationStatusSettings =
-                    HashMap<String, HashMap<*, *>>()
+                val notificationStatusSettings = HashMap<String, HashMap<*, *>>()
                 notificationStatusSettings[OmronConstants.OMRONDeviceNotificationEnableSettingsKey] =
                     notificationEnableSettings
                 deviceSettings.add(userSettings)
@@ -1484,7 +1509,7 @@ class MainActivity : AppCompatActivity() {
         return deviceSettings
     }
 
-    private fun getBCMSettings(deviceSettings: ArrayList<HashMap<*, *>>): ArrayList<HashMap<*, *>>? {
+    private fun getBCMSettings(deviceSettings: ArrayList<HashMap<*, *>?>): ArrayList<HashMap<*, *>?> {
 
         // body composition
         if (device!![OmronConstants.OMRONBLEConfigDevice.Category]!!.toInt() == OmronConstants.OMRONBLEDeviceCategory.BODYCOMPOSITION) {
@@ -1537,14 +1562,14 @@ class MainActivity : AppCompatActivity() {
                 /*val toVitalData = Intent(this@MainActivity, DataListingActivity::class.java)
                 toVitalData.putExtra(
                     Constants.extraKeys.KEY_DEVICE_LOCAL_NAME,
-                    mSelectedPeripheral!!.getLocalName()
+                    mSelectedPeripheral!!.localName
                 )
                 startActivity(toVitalData)*/
             } else {
                 /*val toVitalData = Intent(this@MainActivity, VitalDataListingActivity::class.java)
                 toVitalData.putExtra(
                     Constants.extraKeys.KEY_DEVICE_LOCAL_NAME,
-                    mSelectedPeripheral!!.getLocalName()
+                    mSelectedPeripheral!!.localName
                 )
                 startActivity(toVitalData)*/
             }
@@ -1645,9 +1670,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun setDeviceInformation() {
         if (null != mSelectedPeripheral) {
-            if (null != mSelectedPeripheral!!.getModelName()) {
+            if (null != mSelectedPeripheral!!.modelName) {
                 mTvDeviceInfo!!.text =
-                    mSelectedPeripheral!!.getModelName() + " - " + getString(R.string.device_information)
+                    mSelectedPeripheral!!.modelName + " - " + getString(R.string.device_information)
             } else {
                 mTvDeviceInfo!!.text = getString(R.string.device_information)
             }
@@ -1690,8 +1715,8 @@ class MainActivity : AppCompatActivity() {
         if (mScannedDevicesAdapter != null) {
             mProgressBar!!.visibility = View.GONE
             mPeripheralList = ArrayList()
-            mScannedDevicesAdapter?.setPeripheralList(mPeripheralList)
-            mScannedDevicesAdapter?.notifyDataSetChanged()
+            mScannedDevicesAdapter!!.setPeripheralList(mPeripheralList)
+            mScannedDevicesAdapter!!.notifyDataSetChanged()
         }
     }
 

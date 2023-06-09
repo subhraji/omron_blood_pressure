@@ -8,7 +8,7 @@ import android.net.Uri;
 
 public class OmronDBConstans {
 
-    public static final String AUTHORITY = "com.omronhealthcare.OmronConnectivitySample.Database.OmronDBProvider";
+    public static final String AUTHORITY = "com.example.testomron.database.OmronDBProvider";
     public static final String DB_NAME = "omron_app.db";
     public static final int DB_VERSION = 1;
 

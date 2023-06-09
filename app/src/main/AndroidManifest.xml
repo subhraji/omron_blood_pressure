@@ -33,6 +33,11 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+
+        <provider
+            android:name=".database.OmronDBProvider"
+            android:authorities="com.example.testomron.database.OmronDBProvider"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -42,6 +47,6 @@
                 android:value="" />
         </activity>
         <activity android:name=".activity.BaseActivity" />
+        <receiver android:name=".utility.NotificationPublisher" android:exported="false"/>
     </application>
-
 </manifest>
